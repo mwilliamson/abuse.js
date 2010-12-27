@@ -154,4 +154,10 @@ AbuseTest = TestCase("AbuseTest");
         assertEquals("A A B", results[2]);
         assertEquals(3, results.length);
     };
+    
+    AbuseTest.prototype.testEmptyRuleSetGeneratesNoSentences = function() {
+        var rules = parse("").rules;
+        var results = generateAll(rules);
+        assertEquals(0, results.length);
+    };
 })();

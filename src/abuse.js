@@ -22,13 +22,7 @@
     var terminal = function(text) {
         return {
             text: text,
-            isTerminal: true,
-            expand: function(ruleSet, selector) {
-                return [];
-            },
-            expandAll: function(ruleSet) {
-                return [];
-            }
+            isTerminal: true
         };
     };
 
@@ -173,9 +167,11 @@
             depth += 1;
             node = unexpandedNodes.pop();
             result.push(node.text);
-            newUnexpandedNodes = node.expand(ruleSet, selector);
-            for (i = newUnexpandedNodes.length - 1; i >= 0; i -= 1) {
-                unexpandedNodes.push(newUnexpandedNodes[i]);
+            if (node.isNonTerminal) {
+                newUnexpandedNodes = node.expand(ruleSet, selector);
+                for (i = newUnexpandedNodes.length - 1; i >= 0; i -= 1) {
+                    unexpandedNodes.push(newUnexpandedNodes[i]);
+                }
             }
         }
         return result.join("");
@@ -204,9 +200,12 @@
         unexpandedNode = unexpandedNodes.pop();
         currentResult = currentResult.slice(0);
         currentResult.push(unexpandedNode.text);
+        if (unexpandedNode.isTerminal) {
+            return generateAllRecursive(ruleSet, currentResult, unexpandedNodes, depth);
+        }
         rules = unexpandedNode.expandAll(ruleSet);
         if (rules.length === 0) {
-            return generateAllRecursive(ruleSet, currentResult, unexpandedNodes, depth);
+            return [];
         }
         
         results = [];
