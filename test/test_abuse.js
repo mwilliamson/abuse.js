@@ -45,6 +45,12 @@ AbuseTest = TestCase("AbuseTest");
         assertRule(rules[1], "SENTENCE", [terminal("You smell!")]);
     };
 
+    AbuseTest.prototype.testWhitespaceIsTrimmedFromRight = function() {
+        var rules = parse("$SENTENCE -> I hate you!   \t\t  ").rules;
+        assertEquals(1, rules.length);
+        assertRule(rules[0], "SENTENCE", [terminal("I hate you!")]);
+    };
+
     AbuseTest.prototype.testIgnoresBlankLines = function() {
         var rules = parse("\n    \t\n\n$SENTENCE -> I hate you!\n     \n\n$SENTENCE -> You smell!\n\n\n").rules;
         assertEquals(2, rules.length);
@@ -127,6 +133,11 @@ AbuseTest = TestCase("AbuseTest");
         var rules = parse("$SENTENCE -> $RUDE_WORD\n" + 
                           "$SENTENCE -> Go away!").rules;
         assertEquals("Go away!", generate(rules, staticSelector([0, 0])));
+    };
+    
+    AbuseTest.prototype.testCanGenerateEmptySentence = function() {
+        var rules = parse("$SENTENCE -> ").rules;
+        assertEquals("", generate(rules, staticSelector([0])));
     };
     
     AbuseTest.prototype.testCanGenerateAllSentences = function() {

@@ -66,8 +66,8 @@
             nodes.push(nonTerminal(nonTerminalName));
             index = endOfNonTerminal;
         }
-        if (right.slice(index) !== "") {
-            nodes.push(terminal(right.slice(index)));
+        if (trimmed(right.slice(index)) !== "") {
+            nodes.push(terminal(trimmed(right.slice(index))));
         }
         
         return {
