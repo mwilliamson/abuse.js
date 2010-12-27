@@ -140,7 +140,7 @@
             expand: function(left, selector) {
                 var possibleRules = rules[left];
                 if (possibleRules === undefined) {
-                    return [];
+                    return undefined;
                 }
                 return possibleRules[selector(possibleRules.length)];
             },
@@ -158,17 +158,23 @@
             result = [],
             ruleSet = buildRuleSet(rules),
             depth = -1,
-            all;
+            generateFromAllSentences = function() {
+                var all = generateAll(rules, depth);
+                return all[selector(all.length)];
+            },
+            undefined;
         while (unexpandedNodes.length > 0) {
             if (depth > maxDepth) {
-                all = generateAll(rules, depth);
-                return all[selector(all.length)];
+                return generateFromAllSentences();
             }
             depth += 1;
             node = unexpandedNodes.pop();
             result.push(node.text);
             if (node.isNonTerminal) {
                 newUnexpandedNodes = node.expand(ruleSet, selector);
+                if (newUnexpandedNodes === undefined) {
+                    return generateFromAllSentences();
+                }
                 for (i = newUnexpandedNodes.length - 1; i >= 0; i -= 1) {
                     unexpandedNodes.push(newUnexpandedNodes[i]);
                 }

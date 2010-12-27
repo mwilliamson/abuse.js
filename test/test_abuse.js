@@ -123,6 +123,12 @@ AbuseTest = TestCase("AbuseTest");
         assertEquals("A A B", generate(rules, staticSelector([1, 1, 1, 2]), 3));
     };
     
+    AbuseTest.prototype.testSentenceGenerationResortsToPickingSentenceRandomlyFromAllSentencesIfNonTerminalCannotBeExpanded = function() {
+        var rules = parse("$SENTENCE -> $RUDE_WORD\n" + 
+                          "$SENTENCE -> Go away!").rules;
+        assertEquals("Go away!", generate(rules, staticSelector([0, 0])));
+    };
+    
     AbuseTest.prototype.testCanGenerateAllSentences = function() {
         var rules = parse("$SENTENCE -> I hate you!\n" + 
                           "$SENTENCE -> You smell of $SMELL\n" +
