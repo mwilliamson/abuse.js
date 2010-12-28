@@ -1,8 +1,16 @@
 (function(exports) {
     var nonTerminalChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_";
 
+    var rightTrimmed = function(text) {
+        return text.replace(/\s+$/, "");
+    };
+    
+    var leftTrimmed = function(text) {
+        return text.replace(/^\s+/, "");
+    };
+
     var trimmed = function(text) {
-        return text.replace(/^\s+|\s+$/g, '');
+        return rightTrimmed(leftTrimmed(text));
     };
 
     var nonTerminal = function(name) {
@@ -37,7 +45,8 @@
             dollarIndex,
             endOfNonTerminal,
             nonTerminalName,
-            index = right.search(/\S/);
+            index = right.search(/\S/),
+            remainder;
         
         while ((dollarIndex = right.indexOf("$", index)) !== -1) {
             nodes.push(terminal(right.slice(index, dollarIndex)));
@@ -66,8 +75,9 @@
             nodes.push(nonTerminal(nonTerminalName));
             index = endOfNonTerminal;
         }
-        if (trimmed(right.slice(index)) !== "") {
-            nodes.push(terminal(trimmed(right.slice(index))));
+        remainder = rightTrimmed(right.slice(index));
+        if (remainder !== "") {
+            nodes.push(terminal(remainder));
         }
         
         return {

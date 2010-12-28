@@ -96,6 +96,11 @@ AbuseTest = TestCase("AbuseTest");
         assertEquals("Missing closing brace on line 3 (opening brace at character 41)", errors[0]);
     };
     
+    AbuseTest.prototype.testFinalTerminalIsOnlyTrimmedOnTheRight = function() {
+        var rules = parse("$VERY -> $VERY very").rules;
+        assertRule(rules[0], "VERY", [terminal(""), nonTerminal("VERY"), terminal(" very")]);
+    };
+    
     // Generation
     
     var staticSelector = function(choices) {
