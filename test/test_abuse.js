@@ -85,19 +85,22 @@ AbuseTest = TestCase("AbuseTest");
     
     AbuseTest.prototype.testAddsErrorWithLineNumberIfArrowIsMissing = function() {
         var errors = parse("\n\n$SENTENCE - You're ${RUDE_ADJ}er than I thought\n" +
-                           "$RUDE_ADJ ->\n").errors;
+                           "$RUDE_ADJ ->\n" +
+                           "$SENTENCE -> $RUDE_ADJ").errors;
         assertEquals(1, errors.length);
         assertEquals("Missing symbol on line 3: ->", errors[0]);
     };
     
     AbuseTest.prototype.testAddsErrorWithLineNumberIfClosingBraceIsMissing = function() {
-        var errors = parse("\n\n$SENTENCE -> You're ${RUDE_ADJer than I thought\n\n").errors;
+        var errors = parse("\n\n$SENTENCE -> You're ${RUDE_ADJer than I thought\n" +
+                           "$SENTENCE ->\n").errors;
         assertEquals(1, errors.length);
         assertEquals("Missing closing brace on line 3 (opening brace at character 22)", errors[0]);
     };
     
     AbuseTest.prototype.testAddsErrorWithLineNumberIfClosingBraceForSecondVariableIsMissing = function() {
-        var errors = parse("\n\n$SENTENCE -> You're ${RUDE_ADJ}er than ${OBJ\n\n").errors;
+        var errors = parse("\n\n$SENTENCE -> You're ${RUDE_ADJ}er than ${OBJ\n" +
+                           "$SENTENCE ->\n\n").errors;
         assertEquals(1, errors.length);
         assertEquals("Missing closing brace on line 3 (opening brace at character 41)", errors[0]);
     };
@@ -106,6 +109,12 @@ AbuseTest = TestCase("AbuseTest");
         var errors = parse("\n\n$SENTENCE -> $INSULT\n\n").errors;
         assertEquals(1, errors.length);
         assertEquals("No production rule for non-terminal $INSULT (line 3, character 14)", errors[0]);
+    };
+    
+    AbuseTest.prototype.testAddsErrorIfSentenceHasNoProductionRule = function() {
+        var errors = parse("").errors;
+        assertEquals(1, errors.length);
+        assertEquals("No production rule for non-terminal $SENTENCE", errors[0]);
     };
     
     // Generation

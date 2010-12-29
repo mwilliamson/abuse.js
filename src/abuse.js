@@ -115,19 +115,23 @@
     
     var findOrphanedSymbols = function(rules, errors) {
         var startSymbols = [],
-            nonTerminalsOnRhs = [];
+            nonTerminalsOnRhs = [],
+            missingProductionRuleStr = "No production rule for non-terminal $";
             
         rules.forEach(function(rule) {
-            startSymbols.push(rule.name);
+            startSymbols.push(rule.left.name);
             rule.right.forEach(function(node) {
                 if (node.isNonTerminal) {
                     nonTerminalsOnRhs.push(node);
                 }
             });
         });
+        if (startSymbols.indexOf(sentence.name) === -1) {
+            errors.push(missingProductionRuleStr + sentence.name);
+        }
         nonTerminalsOnRhs.forEach(function(node) {
             if (startSymbols.indexOf(node.name) === -1) {
-                errors.push("No production rule for non-terminal $" + node.name +
+                errors.push(missingProductionRuleStr + node.name +
                             " (line " + node.lineNumber + ", character " + node.characterNumber + ")");
             }
         });
