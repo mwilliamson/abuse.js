@@ -50,6 +50,11 @@ AbuseTest = TestCase("AbuseTest");
         assertEquals(1, rules.length);
         assertRule(rules[0], "SENTENCE", [terminal("I hate you!")]);
     };
+    
+    AbuseTest.prototype.testFinalTerminalIsOnlyTrimmedOnTheRight = function() {
+        var rules = parse("$VERY -> $VERY very").rules;
+        assertRule(rules[0], "VERY", [terminal(""), nonTerminal("VERY"), terminal(" very")]);
+    };
 
     AbuseTest.prototype.testIgnoresBlankLines = function() {
         var rules = parse("\n    \t\n\n$SENTENCE -> I hate you!\n     \n\n$SENTENCE -> You smell!\n\n\n").rules;
@@ -79,7 +84,8 @@ AbuseTest = TestCase("AbuseTest");
     };
     
     AbuseTest.prototype.testAddsErrorWithLineNumberIfArrowIsMissing = function() {
-        var errors = parse("\n\n$SENTENCE - You're ${RUDE_ADJ}er than I thought\n\n").errors;
+        var errors = parse("\n\n$SENTENCE - You're ${RUDE_ADJ}er than I thought\n" +
+                           "$RUDE_ADJ ->\n").errors;
         assertEquals(1, errors.length);
         assertEquals("Missing symbol on line 3: ->", errors[0]);
     };
@@ -96,9 +102,10 @@ AbuseTest = TestCase("AbuseTest");
         assertEquals("Missing closing brace on line 3 (opening brace at character 41)", errors[0]);
     };
     
-    AbuseTest.prototype.testFinalTerminalIsOnlyTrimmedOnTheRight = function() {
-        var rules = parse("$VERY -> $VERY very").rules;
-        assertRule(rules[0], "VERY", [terminal(""), nonTerminal("VERY"), terminal(" very")]);
+    AbuseTest.prototype.testAddsErrorIfNonTerminalIsUsedWithNoMatchingProductionRule = function() {
+        var errors = parse("\n\n$SENTENCE -> $INSULT\n\n").errors;
+        assertEquals(1, errors.length);
+        assertEquals("No production rule for non-terminal $INSULT (line 3, character 14)", errors[0]);
     };
     
     // Generation

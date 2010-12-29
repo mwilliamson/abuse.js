@@ -13,10 +13,12 @@
         return rightTrimmed(leftTrimmed(text));
     };
 
-    var nonTerminal = function(name) {
+    var nonTerminal = function(name, lineNumber, characterNumber) {
         return {
             text: "",
             name: name,
+            lineNumber: lineNumber,
+            characterNumber: characterNumber,
             isNonTerminal: true,
             expand: function(ruleSet, selector) {
                 return ruleSet.expand(name, selector);
@@ -40,7 +42,7 @@
         return nonTerminalChars.indexOf(char) !== -1;
     };
     
-    var parseRight = function(right) {
+    var parseRight = function(right, lineNumber, offset) {
         var nodes = [],
             dollarIndex,
             endOfNonTerminal,
@@ -57,7 +59,7 @@
                     return {
                         error: {
                             missingClosingBrace: true,
-                            openingIndex: dollarIndex + 1
+                            openingIndex: offset + dollarIndex + 1
                         }
                     };
                 }
@@ -72,7 +74,7 @@
                 nonTerminalName = right.substring(dollarIndex + 1, endOfNonTerminal);
             }
             
-            nodes.push(nonTerminal(nonTerminalName));
+            nodes.push(nonTerminal(nonTerminalName, lineNumber, offset + dollarIndex));
             index = endOfNonTerminal;
         }
         remainder = rightTrimmed(right.slice(index));
@@ -95,13 +97,13 @@
             };
         }
         
-        right = parseRight(components[1]);
+        right = parseRight(components[1], lineNumber, components[0].length + splitString.length + 1);
         
         if (right.error) {
             return {
                 error: "Missing closing brace on line " + lineNumber +
                     " (opening brace at character " +
-                    (right.error.openingIndex + components[0].length + splitString.length + 1) +")"
+                    right.error.openingIndex + ")"
             };
         }
         
@@ -109,6 +111,26 @@
             left: nonTerminal(trimmed(components[0]).slice(1)),
             right: right.nodes
         };
+    };
+    
+    var findOrphanedSymbols = function(rules, errors) {
+        var startSymbols = [],
+            nonTerminalsOnRhs = [];
+            
+        rules.forEach(function(rule) {
+            startSymbols.push(rule.name);
+            rule.right.forEach(function(node) {
+                if (node.isNonTerminal) {
+                    nonTerminalsOnRhs.push(node);
+                }
+            });
+        });
+        nonTerminalsOnRhs.forEach(function(node) {
+            if (startSymbols.indexOf(node.name) === -1) {
+                errors.push("No production rule for non-terminal $" + node.name +
+                            " (line " + node.lineNumber + ", character " + node.characterNumber + ")");
+            }
+        });
     };
     
     var parse = function(text) {
@@ -127,6 +149,9 @@
                 }
             }
         }
+        
+        findOrphanedSymbols(rules, errors);
+        
         return {
             rules: rules,
             errors: errors
