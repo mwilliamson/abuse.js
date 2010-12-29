@@ -1,5 +1,12 @@
 (function(exports) {
     var nonTerminalChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_";
+    
+    var errorTypes = {
+        missingArrow: "missingArrow",
+        missingClosingBrace: "missingClosingBrace",
+        noProductionRule: "noProductionRule",
+        ruleNeverUsed: "ruleNeverUsed"
+    };
 
     var rightTrimmed = function(text) {
         return text.replace(/\s+$/, "");
@@ -93,7 +100,11 @@
             right;
         if (components.length < 2) {
             return {
-                error: "Missing symbol on line " + lineNumber + ": " + splitString
+                error: {
+                    str: "Missing symbol on line " + lineNumber + ": " + splitString,
+                    type: errorTypes.missingArrow,
+                    lineNumber: lineNumber
+                }
             };
         }
         
@@ -101,9 +112,14 @@
         
         if (right.error) {
             return {
-                error: "Missing closing brace on line " + lineNumber +
-                    " (opening brace at character " +
-                    right.error.openingIndex + ")"
+                error: {
+                    str: "Missing closing brace on line " + lineNumber +
+                        " (opening brace at character " +
+                        right.error.openingIndex + ")",
+                    type: errorTypes.missingClosingBrace,
+                    lineNumber: lineNumber,
+                    openingBraceCharacterNumber: right.error.openingIndex
+                }
             };
         }
         
@@ -138,18 +154,32 @@
         nonTerminalNames.push(sentence.name);
         
         if (startSymbolNames.indexOf(sentence.name) === -1) {
-            errors.push(missingProductionRuleStr + sentence.name);
+            errors.push({
+                str: missingProductionRuleStr + sentence.name,
+                type: errorTypes.noProductionRule,
+                nonTerminal: sentence.name
+            });
         }
         nonTerminalsOnRhs.forEach(function(node) {
             if (startSymbolNames.indexOf(node.name) === -1) {
-                errors.push(missingProductionRuleStr + node.name +
-                            " (line " + node.lineNumber + ", character " + node.characterNumber + ")");
+                errors.push({
+                    str: missingProductionRuleStr + node.name +
+                         " (line " + node.lineNumber + ", character " + node.characterNumber + ")",
+                    type: errorTypes.noProductionRule,
+                    nonTerminal: node.name,
+                    lineNumber: node.lineNumber,
+                    characterNumber: node.characterNumber
+                });
             }
         });
         startSymbols.forEach(function(node) {
             if (nonTerminalNames.indexOf(node.name) === -1) {
-                errors.push("Production rule with start symbol $" + node.name +
-                            " is never used (line " + node.lineNumber + ")");
+                errors.push({
+                    str: "Production rule with start symbol $" + node.name +
+                         " is never used (line " + node.lineNumber + ")",
+                    type: errorTypes.ruleNeverUsed,
+                    lineNumber: node.lineNumber
+                });
             }
         });
     };
@@ -293,4 +323,5 @@
     exports.randomSelector = function(upper) {
         return Math.floor(Math.random() * upper);
     };
+    exports.errors = errorTypes;
 })(typeof ZWOBBLE === "undefined" ? exports : ZWOBBLE.abuse);
