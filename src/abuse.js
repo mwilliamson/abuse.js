@@ -108,31 +108,48 @@
         }
         
         return {
-            left: nonTerminal(trimmed(components[0]).slice(1)),
+            left: nonTerminal(trimmed(components[0]).slice(1), lineNumber, 1),
             right: right.nodes
         };
     };
     
     var findOrphanedSymbols = function(rules, errors) {
         var startSymbols = [],
+            startSymbolNames,
             nonTerminalsOnRhs = [],
+            nonTerminalNames,
             missingProductionRuleStr = "No production rule for non-terminal $";
             
         rules.forEach(function(rule) {
-            startSymbols.push(rule.left.name);
+            startSymbols.push(rule.left);
             rule.right.forEach(function(node) {
                 if (node.isNonTerminal) {
                     nonTerminalsOnRhs.push(node);
                 }
             });
         });
-        if (startSymbols.indexOf(sentence.name) === -1) {
+        
+        startSymbolNames = startSymbols.map(function(node) {
+            return node.name;
+        });
+        nonTerminalNames = nonTerminalsOnRhs.map(function(node) {
+            return node.name;
+        });
+        nonTerminalNames.push(sentence.name);
+        
+        if (startSymbolNames.indexOf(sentence.name) === -1) {
             errors.push(missingProductionRuleStr + sentence.name);
         }
         nonTerminalsOnRhs.forEach(function(node) {
-            if (startSymbols.indexOf(node.name) === -1) {
+            if (startSymbolNames.indexOf(node.name) === -1) {
                 errors.push(missingProductionRuleStr + node.name +
                             " (line " + node.lineNumber + ", character " + node.characterNumber + ")");
+            }
+        });
+        startSymbols.forEach(function(node) {
+            if (nonTerminalNames.indexOf(node.name) === -1) {
+                errors.push("Production rule with start symbol $" + node.name +
+                            " is never used (line " + node.lineNumber + ")");
             }
         });
     };

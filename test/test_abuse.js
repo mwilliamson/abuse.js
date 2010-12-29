@@ -117,6 +117,12 @@ AbuseTest = TestCase("AbuseTest");
         assertEquals("No production rule for non-terminal $SENTENCE", errors[0]);
     };
     
+    AbuseTest.prototype.testAddsErrorIfProductionRuleIsNeverUsed = function() {
+        var errors = parse("$SENTENCE -> \n$RUDE_ADJ -> ugly").errors;
+        assertEquals(1, errors.length);
+        assertEquals("Production rule with start symbol $RUDE_ADJ is never used (line 2)", errors[0]);
+    };
+    
     // Generation
     
     var staticSelector = function(choices) {
