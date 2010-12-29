@@ -58,7 +58,10 @@
             remainder;
         
         while ((dollarIndex = right.indexOf("$", index)) !== -1) {
-            nodes.push(terminal(right.slice(index, dollarIndex)));
+            remainder = right.slice(index, dollarIndex)
+            if (remainder !== "") {
+                nodes.push(terminal(remainder));
+            }
             
             if (right[dollarIndex + 1] === "{") {
                 endOfNonTerminal = right.indexOf("}", index);

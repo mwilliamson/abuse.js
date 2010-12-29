@@ -58,7 +58,12 @@ AbuseTest = TestCase("AbuseTest");
     
     AbuseTest.prototype.testFinalTerminalIsOnlyTrimmedOnTheRight = function() {
         var rules = parse("$VERY -> $VERY very").rules;
-        assertRule(rules[0], "VERY", [terminal(""), nonTerminal("VERY"), terminal(" very")]);
+        assertRule(rules[0], "VERY", [nonTerminal("VERY"), terminal(" very")]);
+    };
+    
+    AbuseTest.prototype.testEmptyTerminalsAreNotProducedByRules = function() {
+        var rules = parse("$SENTENCE -> $INSULT").rules;
+        assertRule(rules[0], "SENTENCE", [nonTerminal("INSULT")]);
     };
 
     AbuseTest.prototype.testIgnoresBlankLines = function() {
