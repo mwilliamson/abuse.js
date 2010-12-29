@@ -32,6 +32,11 @@ AbuseTest = TestCase("AbuseTest");
 
     // Parsing
     
+    AbuseTest.prototype.testCanParseSourceWithOnlyWhitespace = function() {
+        var rules = parse("\n\n\n\n\n\r\t\t \n\n     \r\n\n").rules;
+        assertEquals(0, rules.length);
+    };
+    
     AbuseTest.prototype.testCanReadRuleForTerminalToNonTerminal = function() {
         var rules = parse("$SENTENCE -> I hate you!").rules;
         assertEquals(1, rules.length);
@@ -64,9 +69,9 @@ AbuseTest = TestCase("AbuseTest");
     };
     
     AbuseTest.prototype.testCanReadNonTerminalsOnRight = function() {
-        var rules = parse("$PHRASE -> You're as $ADJ as a $ANIMAL").rules;
+        var rules = parse("$SENTENCE -> You're as $ADJ as a $ANIMAL").rules;
         assertEquals(1, rules.length);
-        assertRule(rules[0], "PHRASE",
+        assertRule(rules[0], "SENTENCE",
                    [terminal("You're as "), nonTerminal("ADJ"),
                     terminal(" as a "), nonTerminal("ANIMAL")]);
     };
