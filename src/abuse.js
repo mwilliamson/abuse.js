@@ -181,7 +181,8 @@
                     str: "Production rule with start symbol $" + node.name +
                          " is never used (line " + node.lineNumber + ")",
                     type: errorTypes.ruleNeverUsed,
-                    lineNumber: node.lineNumber
+                    lineNumber: node.lineNumber,
+                    start: node.name
                 });
             }
         });

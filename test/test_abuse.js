@@ -144,6 +144,7 @@ AbuseTest = TestCase("AbuseTest");
         assertEquals("Production rule with start symbol $RUDE_ADJ is never used (line 2)", errors[0].str);
         assertEquals(ZWOBBLE.abuse.errors.ruleNeverUsed, errors[0].type);
         assertEquals(2, errors[0].lineNumber);
+        assertEquals("RUDE_ADJ", errors[0].start);
     };
     
     // Generation
