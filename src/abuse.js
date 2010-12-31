@@ -63,7 +63,7 @@
                 nodes.push(terminal(remainder));
             }
             
-            if (right[dollarIndex + 1] === "{") {
+            if (right.charAt(dollarIndex + 1) === "{") {
                 endOfNonTerminal = right.indexOf("}", index);
                 if (endOfNonTerminal === -1) {
                     return {
@@ -78,7 +78,7 @@
             } else {
                 endOfNonTerminal = dollarIndex + 1;
                 while (endOfNonTerminal < right.length &&
-                       isNonTerminalCharacter(right[endOfNonTerminal])) {
+                       isNonTerminalCharacter(right.charAt(endOfNonTerminal))) {
                     endOfNonTerminal += 1;
                 }
                 nonTerminalName = right.substring(dollarIndex + 1, endOfNonTerminal);
