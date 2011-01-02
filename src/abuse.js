@@ -259,6 +259,9 @@
                     return generateFromAllSentences();
                 }
                 ruleIndex = selector(possibleRules.length);
+                if (ruleIndex === undefined || ruleIndex >= possibleRules.length || ruleIndex < 0) {
+                    return undefined;
+                }
                 sequence.push(ruleIndex);
                 newUnexpandedNodes = possibleRules[ruleIndex];
                 for (i = newUnexpandedNodes.length - 1; i >= 0; i -= 1) {

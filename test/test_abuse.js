@@ -200,6 +200,17 @@ AbuseTest = TestCase("AbuseTest");
         assertEquals("Go away!", generate(rules, staticSelector([0, 0])).str);
     };
     
+    AbuseTest.prototype.testSentenceGenerationReturnsUndefinedIfTheSelectorReturnsUndefined = function() {
+        var rules = parse("$SENTENCE -> Go away\n$SENTENCE -> Shut your face$").rules;
+        assertEquals(undefined, generate(rules, staticSelector([undefined])));
+    };
+    
+    AbuseTest.prototype.testSentenceGenerationReturnsUndefinedIfTheSelectorReturnsAnOutOfRangeIndex = function() {
+        var rules = parse("$SENTENCE -> Go away\n$SENTENCE -> Shut your face$").rules;
+        assertEquals(undefined, generate(rules, staticSelector([-1])));
+        assertEquals(undefined, generate(rules, staticSelector([2])));
+    };
+    
     AbuseTest.prototype.testCanGenerateEmptySentence = function() {
         var rules = parse("$SENTENCE -> ").rules;
         assertEquals("", generate(rules, staticSelector([0])).str);
