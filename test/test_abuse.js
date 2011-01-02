@@ -226,6 +226,26 @@ AbuseTest = TestCase("AbuseTest");
         assertEquals("You're as stupid as my dog", results[6].str);
     };
     
+    AbuseTest.prototype.testGenerationSequenceIsRecordedWhenGeneratingAllSentences = function() {
+        var rules = parse("$SENTENCE -> I hate you!\n" + 
+                          "$SENTENCE -> You smell of $SMELL\n" +
+                          "$SMELL -> elderberries\n" +
+                          "$SMELL -> dogfood\n" +
+                          "$SENTENCE -> You're as $RUDE_ADJ as my $PET\n" +
+                          "$RUDE_ADJ -> ugly\n" +
+                          "$RUDE_ADJ -> stupid\n" +
+                          "$PET -> rat\n" +
+                          "$PET -> dog\n").rules;
+        var results = generateAll(rules);
+        assertEquals(7, results.length);
+        var generationSequence = results[4].sequence;
+        assertEquals(2, generationSequence[0]);
+        assertEquals(0, generationSequence[1]);
+        assertEquals(1, generationSequence[2]);
+        
+        assertEquals(3, generationSequence.length);
+    };
+    
     AbuseTest.prototype.testSettingDepthOnGenerateAllLimitsRecursionDepth = function() {
         var rules = parse("$SENTENCE -> B\n" + 
                           "$SENTENCE -> A $SENTENCE").rules;
