@@ -27,9 +27,6 @@
             lineNumber: lineNumber,
             characterNumber: characterNumber,
             isNonTerminal: true,
-            expand: function(ruleSet, selector) {
-                return ruleSet.expand(name, selector);
-            },
             expandAll: function(ruleSet) {
                 return ruleSet.expandAll(name);
             }
@@ -227,12 +224,8 @@
             rules[left].push(rule.right);
         }
         return {
-            expand: function(left, selector) {
-                var possibleRules = rules[left];
-                if (possibleRules === undefined) {
-                    return undefined;
-                }
-                return possibleRules[selector(possibleRules.length)];
+            rulesFor: function(left) {
+                return rules[left] || [];
             },
             expandAll: function(left) {
                 return rules[left] || [];
@@ -246,7 +239,10 @@
             newUnexpandedNodes,
             i,
             result = [],
+            sequence = [],
+            ruleIndex,
             ruleSet = buildRuleSet(rules),
+            possibleRules,
             depth = -1,
             generateFromAllSentences = function() {
                 var all = generateAll(rules, depth);
@@ -261,17 +257,21 @@
             node = unexpandedNodes.pop();
             result.push(node.text);
             if (node.isNonTerminal) {
-                newUnexpandedNodes = node.expand(ruleSet, selector);
-                if (newUnexpandedNodes === undefined) {
+                possibleRules = ruleSet.rulesFor(node.name);
+                if (possibleRules.length === 0) {
                     return generateFromAllSentences();
                 }
+                ruleIndex = selector(possibleRules.length);
+                sequence.push(ruleIndex);
+                newUnexpandedNodes = possibleRules[ruleIndex];
                 for (i = newUnexpandedNodes.length - 1; i >= 0; i -= 1) {
                     unexpandedNodes.push(newUnexpandedNodes[i]);
                 }
             }
         }
         return {
-            str: result.join("")
+            str: result.join(""),
+            sequence: sequence
         };
     };
     

@@ -174,6 +174,20 @@ AbuseTest = TestCase("AbuseTest");
         assertEquals("You smell of dogfood", generate(rules, staticSelector([0, 1])).str);
     };
     
+    AbuseTest.prototype.testGenerationSequenceIsIncludedInGeneratedSentence = function() {
+        var rules = parse("$SENTENCE -> You're as $RUDE_ADJ as $ANIMAL\n" +
+                          "$RUDE_ADJ -> smelly\n" +
+                          "$RUDE_ADJ -> stupid\n" +
+                          "$ANIMAL -> a dog\n" +
+                          "$ANIMAL -> a donkey").rules,
+            generationSequence = generate(rules, staticSelector([0, 1, 0])).sequence; 
+        
+        assertEquals(0, generationSequence[0]);
+        assertEquals(1, generationSequence[1]);
+        assertEquals(0, generationSequence[2]);
+        assertEquals(3, generationSequence.length);
+    };
+    
     AbuseTest.prototype.testSentenceGenerationResortsToPickingSentenceRandomlyFromAllSentencesIfMaximumDepthIsReached = function() {
         var rules = parse("$SENTENCE -> B\n" + 
                           "$SENTENCE -> A $SENTENCE").rules;
