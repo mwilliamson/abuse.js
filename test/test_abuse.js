@@ -157,38 +157,38 @@ AbuseTest = TestCase("AbuseTest");
     
     AbuseTest.prototype.testCanGenerateSentenceFromSimpleRule = function() {
         var rules = parse("$SENTENCE -> I hate you!").rules; 
-        assertEquals("I hate you!", generate(rules, staticSelector([0])));
+        assertEquals("I hate you!", generate(rules, staticSelector([0])).str);
     };
     
     AbuseTest.prototype.testUsesSelectorToPickRuleWhenThereAreManyPossibleRules = function() {
         var rules = parse("$SENTENCE -> I hate you!\n$SENTENCE -> Go away!").rules; 
-        assertEquals("I hate you!", generate(rules, staticSelector([0])));
-        assertEquals("Go away!", generate(rules, staticSelector([1])));
+        assertEquals("I hate you!", generate(rules, staticSelector([0])).str);
+        assertEquals("Go away!", generate(rules, staticSelector([1])).str);
     };
     
     AbuseTest.prototype.testCanUseIntermediateRules = function() {
         var rules = parse("$SENTENCE -> You smell of $SMELL\n" +
                           "$SMELL -> elderberries\n" +
                           "$SMELL -> dogfood").rules; 
-        assertEquals("You smell of elderberries", generate(rules, staticSelector([0, 0])));
-        assertEquals("You smell of dogfood", generate(rules, staticSelector([0, 1])));
+        assertEquals("You smell of elderberries", generate(rules, staticSelector([0, 0])).str);
+        assertEquals("You smell of dogfood", generate(rules, staticSelector([0, 1])).str);
     };
     
     AbuseTest.prototype.testSentenceGenerationResortsToPickingSentenceRandomlyFromAllSentencesIfMaximumDepthIsReached = function() {
         var rules = parse("$SENTENCE -> B\n" + 
                           "$SENTENCE -> A $SENTENCE").rules;
-        assertEquals("A A B", generate(rules, staticSelector([1, 1, 1, 2]), 3));
+        assertEquals("A A B", generate(rules, staticSelector([1, 1, 1, 2]), 3).str);
     };
     
     AbuseTest.prototype.testSentenceGenerationResortsToPickingSentenceRandomlyFromAllSentencesIfNonTerminalCannotBeExpanded = function() {
         var rules = parse("$SENTENCE -> $RUDE_WORD\n" + 
                           "$SENTENCE -> Go away!").rules;
-        assertEquals("Go away!", generate(rules, staticSelector([0, 0])));
+        assertEquals("Go away!", generate(rules, staticSelector([0, 0])).str);
     };
     
     AbuseTest.prototype.testCanGenerateEmptySentence = function() {
         var rules = parse("$SENTENCE -> ").rules;
-        assertEquals("", generate(rules, staticSelector([0])));
+        assertEquals("", generate(rules, staticSelector([0])).str);
     };
     
     AbuseTest.prototype.testCanGenerateAllSentences = function() {
@@ -203,13 +203,13 @@ AbuseTest = TestCase("AbuseTest");
                           "$PET -> dog\n").rules;
         var results = generateAll(rules);
         assertEquals(7, results.length);
-        assertEquals("I hate you!", results[0]);
-        assertEquals("You smell of elderberries", results[1]);
-        assertEquals("You smell of dogfood", results[2]);
-        assertEquals("You're as ugly as my rat", results[3]);
-        assertEquals("You're as ugly as my dog", results[4]);
-        assertEquals("You're as stupid as my rat", results[5]);
-        assertEquals("You're as stupid as my dog", results[6]);
+        assertEquals("I hate you!", results[0].str);
+        assertEquals("You smell of elderberries", results[1].str);
+        assertEquals("You smell of dogfood", results[2].str);
+        assertEquals("You're as ugly as my rat", results[3].str);
+        assertEquals("You're as ugly as my dog", results[4].str);
+        assertEquals("You're as stupid as my rat", results[5].str);
+        assertEquals("You're as stupid as my dog", results[6].str);
     };
     
     AbuseTest.prototype.testSettingDepthOnGenerateAllLimitsRecursionDepth = function() {
@@ -217,9 +217,9 @@ AbuseTest = TestCase("AbuseTest");
                           "$SENTENCE -> A $SENTENCE").rules;
         var results = generateAll(rules, 3);
         
-        assertEquals("B", results[0]);
-        assertEquals("A B", results[1]);
-        assertEquals("A A B", results[2]);
+        assertEquals("B", results[0].str);
+        assertEquals("A B", results[1].str);
+        assertEquals("A A B", results[2].str);
         assertEquals(3, results.length);
     };
     

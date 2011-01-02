@@ -270,7 +270,9 @@
                 }
             }
         }
-        return result.join("");
+        return {
+            str: result.join("")
+        };
     };
     
     var reversed = function(array) {
@@ -288,7 +290,9 @@
             results,
             subResults;
         if (unexpandedNodes.length === 0) {
-            return [currentResult.join("")];
+            return [{
+                str: currentResult.join("")
+            }];
         }
         if (depth === -1) {
             return [];
