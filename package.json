@@ -1,0 +1,16 @@
+{
+  "author": "Michael Williamson",
+  "name": "abuse",
+  "description": "A library to mock you",
+  "version": "0.1.0",
+  "homepage": "https://github.com/mwilliamson/abuse.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mwilliamson/abuse.js.git"
+  },
+  "engines": {
+    "node": "~v0.4.4"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
